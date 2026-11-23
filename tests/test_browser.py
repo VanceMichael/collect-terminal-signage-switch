@@ -2,7 +2,7 @@
 import unittest
 
 from playwright.sync_api import sync_playwright
-from test_source import SourceTests
+import test_source
 
 
 class BrowserDeskTests(unittest.TestCase):
@@ -10,8 +10,8 @@ class BrowserDeskTests(unittest.TestCase):
 
     @classmethod
     def setUpClass(cls):
-        SourceTests.setUpClass()
-        cls.addClassCleanup(SourceTests.tearDownClass)
+        test_source.SourceTests.setUpClass()
+        cls.addClassCleanup(test_source.SourceTests.tearDownClass)
         cls.runtime = sync_playwright().start()
         cls.addClassCleanup(cls.runtime.stop)
         cls.browser = cls.runtime.chromium.launch()
@@ -20,10 +20,10 @@ class BrowserDeskTests(unittest.TestCase):
     def test_visible_receipts(self):
         page = self.browser.new_page()
         self.addCleanup(page.close)
-        for form in SourceTests.config["forms"]:
+        for form in test_source.SourceTests.config["forms"]:
             for values, message in form["choices"]:
                 with self.subTest(path=form["path"], values=values):
-                    page.goto(SourceTests.url + form["path"])
+                    page.goto(test_source.SourceTests.url + form["path"])
                     for label, value in zip(form["fields"].values(), values, strict=True):
                         page.get_by_label(label, exact=True).fill(value)
                     page.get_by_role("button", name="办理").click()
